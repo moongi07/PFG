@@ -1,0 +1,436 @@
+<div class="contenedor-menu-cesta">
+  <!-- Columna de productos -->
+  <div class="menu-column">
+    
+    <!-- Sección: Cafés -->
+    <section class="menu-seccion">
+      <h2>Cafés</h2>
+      <div class="tarjetas-producto">
+        <% secciones.cafes.forEach(cafe => { %>
+          <div class="tarjeta">
+            <h3><%= cafe.nombre %></h3>
+            <img src="imagenes/productos/<%= cafe.id %>.jpg" alt="<%= cafe.nombre %>" class="producto-img">
+            <div class="descripcion" style="display: none;"><%= cafe.descripcion %></div>
+            <span class="precio"><%= cafe.precio.toFixed(2) %> €</span>
+            <div class="botones">
+              <button onclick="añadirACesta('<%= cafe.nombre %>', '<%= cafe.id %>')">Añadir a la cesta</button>
+              <button onclick="toggleDescripcion(this)">Ver descripción</button>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+
+    <!-- Sección: Bebidas -->
+    <section class="menu-seccion">
+      <h2>Bebidas</h2>
+      <div class="tarjetas-producto">
+        <% secciones.bebidas.forEach(bebida => { %>
+          <div class="tarjeta">
+            <h3><%= bebida.nombre %></h3>
+            <img src="imagenes/productos/<%= bebida.id %>.jpg" alt="<%= bebida.nombre %>" class="producto-img">
+            <div class="descripcion" style="display: none;"><%= bebida.descripcion %></div>
+            <span class="precio"><%= bebida.precio.toFixed(2) %> €</span>
+            <div class="botones">
+              <button onclick="añadirACesta('<%= bebida.nombre %>', '<%= bebida.id %>')">Añadir a la cesta</button>
+              <button onclick="toggleDescripcion(this)">Ver descripción</button>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+
+    <!-- Sección: Dulces -->
+    <section class="menu-seccion">
+      <h2>Dulces</h2>
+      <div class="tarjetas-producto">
+        <% secciones.dulces.forEach(dulce => { %>
+          <div class="tarjeta">
+            <h3><%= dulce.nombre %></h3>
+            <img src="imagenes/productos/<%= dulce.id %>.jpg" alt="<%= dulce.nombre %>" class="producto-img">
+            <div class="descripcion" style="display: none;"><%= dulce.descripcion %></div>
+            <span class="precio"><%= dulce.precio.toFixed(2) %> €</span>
+            <div class="botones">
+               <button onclick="añadirACesta('<%= dulce.nombre %>', '<%= dulce.id %>')">Añadir a la cesta</button>
+              <button onclick="toggleDescripcion(this)">Ver descripción</button>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Columna de la cesta -->
+  <aside class="cesta-column">
+    <div id="cart-container">
+      <h3>Tu Cesta</h3>
+      <div id="cart-items"></div>
+      <div class="cart-total">
+        <strong>Total:</strong> <span id="total-amount">0,00 €</span>
+      </div>
+      <button id="realizar-pedido">Realizar Pedido</button>
+    </div>
+  </aside>
+</div>
+
+<script>
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioContext();
+  const soundBuffers = { click: null, success: null };
+
+  function loadSound(url, name) {
+    fetch(url)
+      .then(res => res.arrayBuffer())
+      .then(buffer => audioCtx.decodeAudioData(buffer))
+      .then(decoded => soundBuffers[name] = decoded)
+      .catch(err => console.error(`Error cargando sonido ${name}:`, err));
+  }
+
+  function playSound(name) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (!soundBuffers[name]) return;
+    const src = audioCtx.createBufferSource();
+    src.buffer = soundBuffers[name];
+    src.connect(audioCtx.destination);
+    src.start(0);
+  }
+
+  loadSound('sonidos/click.wav', 'click');
+  loadSound('sonidos/success.mp3', 'success');
+
+  function toggleDescripcion(button) {
+    const descripcion = button.closest('.tarjeta').querySelector('.descripcion');
+    const visible = descripcion.style.display === 'block';
+    descripcion.style.display = visible ? 'none' : 'block';
+    button.textContent = visible ? 'Ver descripción' : 'Ocultar descripción';
+  }
+
+  let cart = {};
+  const cartItemsContainer = document.getElementById('cart-items');
+  const totalPriceEl = document.getElementById('total-amount');
+  const placeOrderBtn = document.getElementById('realizar-pedido');
+
+  // Recolectar productos desde el HTML
+  const allMenuItems = Array.from(document.querySelectorAll('.tarjeta')).map(card => {
+    const id = card.querySelector('img').src.match(/\/(\d+)\.jpg$/)[1];
+    const name = card.querySelector('h3').textContent;
+    const price = parseFloat(card.querySelector('.precio').textContent.replace('€', '').trim().replace(',', '.'));
+    return { id, name, price };
+  });
+
+  function añadirACesta(nombre, id) {
+    playSound('click');
+    cart[id] = (cart[id] || 0) + 1;
+    renderCart();
+  }
+
+  function updateQuantity(id, change) {
+    playSound('click');
+    if (cart[id]) {
+      cart[id] += change;
+      if (cart[id] <= 0) delete cart[id];
+    }
+    renderCart();
+  }
+
+  function renderCart() {
+    cartItemsContainer.innerHTML = '';
+    let totalPrice = 0;
+
+    const itemIds = Object.keys(cart);
+
+    if (itemIds.length === 0) {
+      cartItemsContainer.innerHTML = '<p class="empty-cart-message">Tu cesta está vacía.</p>';
+      placeOrderBtn.style.display = 'none';
+    } else {
+      itemIds.forEach(id => {
+        const item = allMenuItems.find(prod => prod.id === id);
+        const cantidad = cart[id];
+        const totalItem = item.price * cantidad;
+        totalPrice += totalItem;
+
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <span class="cart-item-name">${item.name}</span>
+          <div class="cart-item-quantity">
+            <button class="quantity-btn" data-id="${id}" data-change="-1">-</button>
+            <span>${cantidad}</span>
+            <button class="quantity-btn" data-id="${id}" data-change="1">+</button>
+          </div>
+          <span class="cart-item-price">${totalItem.toFixed(2)} €</span>
+        `;
+        cartItemsContainer.appendChild(div);
+      });
+
+      placeOrderBtn.style.display = 'block';
+    }
+
+    totalPriceEl.textContent = totalPrice.toFixed(2) + ' €';
+  }
+
+  cartItemsContainer.addEventListener('click', (e) => {
+    if (e.target.classList.contains('quantity-btn')) {
+      const id = e.target.dataset.id;
+      const change = parseInt(e.target.dataset.change);
+      updateQuantity(id, change);
+    }
+  });
+
+placeOrderBtn.addEventListener('click', () => {
+  if (Object.keys(cart).length === 0) return;
+
+  // Verificar si el usuario está logueado
+  fetch('/usuario-logeado')
+    .then(res => res.json())
+    .then(data => {
+      if (!data.logeado) {
+        // Redirigir al login si no está logueado
+        window.location.href = '/login';
+      } else {
+        // Enviar los datos del carrito al backend y redirigir a /compra
+        const pedido = Object.keys(cart).map(id => {
+          const item = allMenuItems.find(prod => prod.id === id);
+              return {
+          id: item.id,
+          nombre: item.name,
+          cantidad: cart[id],
+          precio: item.price  // <--- asegúrate de que se llama igual que en la ruta /compra
+        };
+        });
+
+        // Enviar pedido al servidor
+        fetch('/pedidos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: pedido })
+        })
+        .then(res => {
+          if (!res.ok) throw new Error('Error al enviar pedido');
+          return res.json();
+        })
+        .then(data => {
+          // Vaciar carrito y redirigir a /compra (donde se genera el PDF)
+          cart = {};
+          renderCart();
+          window.open('/compra', '_blank');
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Error al procesar el pedido.');
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error al verificar sesión:', error);
+      alert('Error de conexión con el servidor.');
+    });
+});
+
+
+  
+</script>
+
+
+<!-- CSS para estilo en columnas -->
+<style>
+  .tarjetas-producto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+  .contenedor-menu-cesta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 40px;
+    background-color: #f9f5ef;
+  }
+
+  .menu-column {
+    flex: 3;
+  }
+
+  .cesta-column {
+    flex: 1;
+    position: sticky;
+    top: 20px;
+  }
+
+  #cart-container {
+    background-color: #fffaf3;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-family: 'Indie Flower', cursive;
+  }
+
+  #cart-container h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 24px;
+  }
+
+  .cart-total {
+    border-top: 1px dashed #aaa;
+    margin-top: 15px;
+    padding-top: 10px;
+    text-align: right;
+    font-size: 18px;
+  }
+  .cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px dashed #ccc;
+  font-size: 15px;
+}
+
+.cart-item-name {
+  flex: 2;
+}
+
+.cart-item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cart-item-price {
+  flex: 1;
+  text-align: right;
+}
+.quantity-btn {
+  padding: 4px 8px;
+  background-color: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.quantity-btn:hover {
+  background-color: #ccc;
+}
+
+
+  #realizar-pedido {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px;
+    width: 100%;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    margin-top: 15px;
+    cursor: pointer;
+  }
+
+  #realizar-pedido:hover {
+    background-color: #45a049;
+  }
+
+  .descripcion {
+    display: none;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #444;
+  }
+.tarjeta {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.tarjeta:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.producto-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.tarjeta h3 {
+  font-size: 20px;
+  margin: 10px 0;
+  color: #333;
+}
+
+.precio {
+  display: block;
+  margin: 10px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #5a2e15;
+}
+
+.descripcion {
+  display: none;
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.botones {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.botones button {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.botones button:first-child {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.botones button:first-child:hover {
+  background-color: #45a049;
+}
+
+.botones button:last-child {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.botones button:last-child:hover {
+  background-color: #e0e0e0;
+}
+
+  @media (max-width: 900px) {
+    .contenedor-menu-cesta {
+      flex-direction: column;
+    }
+
+    .menu-column,
+    .cesta-column {
+      width: 100%;
+    }
+
+    .cesta-column {
+      position: static;
+    }
+  }
+</style>

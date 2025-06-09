@@ -1,0 +1,167 @@
+<div class="fondo">
+  <div class="iz">
+    <h1>Consulte nuestro catálogo</h1>
+      <p>Descubre una selección única de cafés, libros y momentos especiales. Hecho con amor, para ti. ☕📚</p>
+    <a href="/menu" class="btn-catalogo">Comprar ahora</a>
+  </div>
+  <div class="der" style="background-image: url('imagenes/fondos/1.jpg'); ">
+    <div class="mensaje">  <a href="/menu">Prueba nuestro Iced Latte!</a></div>
+  </div>
+</div>
+<div class="fondo">
+  <div class="der" style="background-image: url('imagenes/fondos/5.jpg'); ">
+  </div>
+<div class="iz">
+  <h1>Descubre tu café ideal</h1>
+  <p>Haz nuestro breve test y encuentra el tipo de café que mejor se adapta a tu gusto.</p>
+  <a href="/quiz" class="btn-catalogo">Comenzar el Quiz</a>
+</div>
+
+
+<style>
+  .fondo {
+    display: flex;
+  }
+
+  .iz {
+    background-color: rgb(71, 43, 43);
+    width: 50%;
+    height: 83vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: 'Playfair Display', serif;
+  }
+  .iz p {
+  max-width: 80%;
+  text-align: center;
+  font-size: 18px;
+  margin-top: 10px;
+  color: #f0e6e6;
+}
+
+
+  .der {
+    
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    background-position: center; 
+    width: 50%; 
+    height: 83vh; 
+    position: relative;
+    transition: background-size 1s ease;
+  }
+  .der:hover
+  {
+    background-size: 110%;
+  }
+
+  .btn-catalogo {
+    margin-top: 20px;
+    padding: 12px 25px;
+    background-color: #ffffff;
+    color: #5b2e2e;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .btn-catalogo:hover {
+    background-color: #080707;
+    color: white;
+  }
+
+.mensaje {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  text-align: center;
+
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+
+  opacity: 0;
+  transition: all 0.5s ease;
+  pointer-events: none; 
+}
+
+.der:hover .mensaje {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.mensaje a {
+  color: #9ea6a6;
+  text-decoration: none;
+  pointer-events: auto;
+  transition: color 0.3s;
+}
+
+.mensaje a:hover {
+  color: #ffffff;
+  text-shadow: 0 0 10px #889090;
+}
+
+/* Estilos para tablets */
+@media (max-width: 1024px) {
+  .fondo {
+    flex-direction: column;
+  }
+
+  .iz,
+  .der {
+    width: 100%;
+    height: auto;
+    min-height: 60vh;
+  }
+
+  .mensaje {
+    font-size: 1.6rem;
+    padding: 0.8rem 1.5rem;
+  }
+
+  .iz p {
+    font-size: 16px;
+  }
+}
+
+/* Estilos para móviles */
+@media (max-width: 600px) {
+  .mensaje {
+    font-size: 1.3rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .btn-catalogo {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+
+  .iz h1 {
+    font-size: 1.5rem;
+    text-align: center;
+    margin: 0 10px;
+  }
+
+  .iz p {
+    font-size: 15px;
+    max-width: 90%;
+  }
+}
+
+</style>
+
+<script>
+    document.title = "Café entre Líneas";
+</script>

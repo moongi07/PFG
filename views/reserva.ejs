@@ -1,0 +1,411 @@
+ 
+
+ <div id="main-container">
+  <h1>Haz clic en una mesa para reservarla.</h1>
+
+  <div id="cafe-map-container">
+    <div id="cafe-map">
+      <!-- Mesas -->
+      <div class="table available" id="table-1" style="top: 50px; left: 50px;">M1</div>
+      <div class="table available" id="table-2" style="top: 50px; left: 150px;">M2</div>
+      <div class="table available" id="table-3" style="top: 50px; left: 250px;">M3</div>
+      <div class="table available" id="table-4" style="top: 180px; left: 50px;">M4</div>
+      <div class="table available" id="table-5" style="top: 180px; left: 150px;">M5</div>
+      <div class="table available" id="table-6" style="top: 310px; left: 50px; width: 100px; height: 100px; border-radius: 15px;">M6</div>
+      <div class="table available" id="table-7" style="top: 310px; left: 250px;">M7</div>
+      <div class="table available" id="table-8" style="top: 310px; left: 350px;">M8</div>
+    </div>
+    <p id="legend-text">Selecciona una mesa verde para reservar. Las rojas ya están ocupadas.</p>
+  </div>
+
+  <div id="booking-modal" class="hidden">
+    <div id="booking-form">
+      <h2>Reservar Mesa <span id="table-number-display"></span></h2>
+      <label for="time">Fecha y hora:</label>
+        <input type="datetime-local" id="time" required>
+      <button id="reserve-btn">Confirmar Reserva</button>
+      <button id="cancel-btn">Cancelar</button>
+      <div id="error-message" class="hidden">Por favor, complete todos los campos.</div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+    
+  const tables = document.querySelectorAll('.table');
+  const bookingModal = document.getElementById('booking-modal');
+  const tableNumberDisplay = document.getElementById('table-number-display');
+  const reserveBtn = document.getElementById('reserve-btn');
+  const cancelBtn = document.getElementById('cancel-btn');
+  const timeInput = document.getElementById('time');
+  const errorMessage = document.getElementById('error-message');
+
+  let selectedTable = null;
+  const reservations = {};
+
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioContext();
+  const soundBuffers = { click: null, success: null };
+
+function closeBookingModal() {
+  bookingModal.classList.add('hidden');
+  timeInput.value = '';
+  if (selectedTable) {
+    selectedTable.classList.remove('selected');
+    selectedTable = null;
+  }
+}
+
+  function loadSound(url, name) {
+    fetch(url)
+      .then(res => res.arrayBuffer())
+      .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+      .then(audioBuffer => { soundBuffers[name] = audioBuffer; })
+      .catch(err => console.error(`Error loading sound: ${name}`, err));
+  }
+
+  function playSound(name) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (!soundBuffers[name]) return;
+    const source = audioCtx.createBufferSource();
+    source.buffer = soundBuffers[name];
+    source.connect(audioCtx.destination);
+    source.start(0);
+  }
+
+  loadSound('sonidos/click.wav', 'click');
+  loadSound('sonidosa/success.mp3', 'success');
+
+fetch('/api/mesas-reservadas')
+  .then(res => res.json())
+  .then(data => {
+    data.forEach(({ mesa_id }) => {
+      const table = document.getElementById(mesa_id);
+      if (table) {
+        table.classList.remove('available');
+        table.classList.add('reserved');
+        table.innerHTML = 'Reservado';
+      }
+    });
+  })
+  .catch(err => console.error('Error al cargar reservas:', err));
+
+
+  // Resto del código (eventos y lógica de reserva)
+
+  tables.forEach(table => {
+    table.addEventListener('click', () => {
+      if (table.classList.contains('reserved')) {
+        const res = reservations[table.id];
+        const fecha = res ? new Date(res.time).toLocaleString('es-ES') : 'desconocida';
+        alert(`Mesa reservada`);
+        return;
+      }
+
+      playSound('click');
+      if (selectedTable) selectedTable.classList.remove('selected');
+      selectedTable = table;
+      selectedTable.classList.add('selected');
+
+      const tableIdText = selectedTable.id.split('-').pop();
+      tableNumberDisplay.textContent = tableIdText;
+      bookingModal.classList.remove('hidden');
+      errorMessage.classList.add('hidden');
+      timeInput.focus();
+    });
+  });
+
+ reserveBtn.addEventListener('click', async () => {
+  const time = timeInput.value.trim();
+  if (!time) {
+    errorMessage.classList.remove('hidden');
+    return;
+  }
+
+  if (selectedTable) {
+    playSound('success');
+    selectedTable.classList.remove('available', 'selected');
+    selectedTable.classList.add('reserved');
+
+    const tableId = selectedTable.id;
+    reservations[tableId] = { time };
+    selectedTable.innerHTML = 'Reservado';
+
+   try {
+  const response = await fetch('/reservas', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fecha: time, mesa: tableId })
+  });
+
+  if (!response.ok) throw new Error('Error al guardar la reserva');
+
+  const result = await response.json();
+  console.log('Reserva guardada:', result);
+
+  playSound('success'); // ✅ Solo si fue exitosa
+  closeBookingModal();
+  
+} catch (error) {
+  console.error('Error al enviar la reserva:', error);
+  alert('Hubo un problema al guardar tu reserva. Intenta de nuevo.');
+}
+
+  }
+});
+
+  cancelBtn.addEventListener('click', closeBookingModal);
+  bookingModal.addEventListener('click', event => {
+    if (event.target === bookingModal) closeBookingModal();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !bookingModal.classList.contains('hidden')) {
+      closeBookingModal();
+    }
+  });
+});
+
+</script>
+
+
+<style>
+  body {
+    text-align: center;
+    background-color: #f4f1ea;
+    color: #4a2c2a;
+    margin: 0;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+#main-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+
+h1 {
+  color: #5a3e36;
+  font-size: 2.4rem;
+  margin-top: 30px;
+  margin-bottom: 0;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+
+p {
+    font-size: 1.1rem;
+    color: #8c7851;
+}
+
+#cafe-map-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #fffdf8;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+#legend-text {
+  color: #7a5c51;
+  font-style: italic;
+  margin-top: 10px;
+  font-size: 1rem;
+}
+
+
+#cafe-map {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    background-image: url('imagenes/fondos/floor.jpg');
+    background-size: cover;
+    border: 8px solid #6f4e37;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2), inset 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.table {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-color: #a3d2ca; 
+    border: 3px solid #5eaaa8;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease-in-out, background-color 0.3s, box-shadow 0.2s;
+    user-select: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.table:hover {
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.table.available {
+    background-color: #8fbc8f; 
+    border-color: #2e8b57;
+}
+
+.table.selected {
+    background-color: #ffda79; 
+    border-color: #ffb142;
+    transform: scale(1.15) !important;
+    box-shadow: 0 0 20px #ffda79;
+}
+
+.table.reserved {
+    background-color: #d9534f; 
+    border-color: #b33e3a;
+    cursor: not-allowed;
+    text-align: center;
+    line-height: 1.2;
+    font-size: 0.8rem;
+    padding: 2px;
+}
+
+.table.reserved:hover {
+    transform: scale(1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#booking-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#booking-modal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+#booking-form {
+    background: #fff8e1;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 320px;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+#booking-modal:not(.hidden) #booking-form {
+    transform: scale(1);
+}
+
+
+#booking-form h2 {
+    margin-top: 0;
+    text-align: center;
+    color: #6f4e37;
+}
+
+#booking-form label {
+    font-weight: bold;
+    color: #8c7851;
+}
+
+#booking-form input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+}
+
+#booking-form input:focus {
+    outline: none;
+    border-color: #ffb142;
+    box-shadow: 0 0 5px rgba(255, 177, 66, 0.5);
+}
+
+#booking-form button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    font-size: 1rem;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+#booking-form button:active {
+    transform: scale(0.98);
+}
+
+#reserve-btn {
+    background-color: #5cb85c;
+    margin-top: 10px;
+}
+#reserve-btn:hover {
+    background-color: #4a934a;
+}
+
+#cancel-btn {
+    background-color: #f0ad4e;
+}
+
+#cancel-btn:hover {
+    background-color: #d89635;
+}
+
+#error-message {
+    color: #d9534f;
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    border-radius: 5px;
+    background-color: rgba(217, 83, 79, 0.1);
+}
+
+#error-message.hidden {
+    display: none;
+}
+#cafe-map {
+  animation: fadeInScale 0.6s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+</style>

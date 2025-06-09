@@ -1,0 +1,195 @@
+<div class="login-container">
+  <div class="login-form">
+    <h2>Regístrate</h2>
+
+
+<% if (mensaje !== "") { %>
+  <div class="alerta"><%= mensaje %></div>
+<% } %>
+
+
+
+    <form action="/registro" method="POST">
+      <div class="input-group">
+        <label for="tnombre">Nombre</label>
+        <input type="text" id="tnombre" name="tnombre" maxlength="50" required autocomplete="off" placeholder="Nombre" autofocus>
+      </div>
+
+      <div class="input-group">
+        <label for="tapellidos">Apellidos</label>
+        <input type="text" id="tapellidos" name="tapellidos" maxlength="50" required autocomplete="off" placeholder="Apellidos">
+      </div>
+
+      <div class="input-group">
+        <label for="tusuario">Usuario</label>
+        <input type="text" id="tusuario" name="tusuario" maxlength="20" required autocomplete="off" placeholder="Usuario">
+      </div>
+
+      <div class="input-group">
+        <label for="temail">Correo electrónico</label>
+        <input type="email" id="temail" name="temail" maxlength="50" required autocomplete="off" placeholder="ejemplo@email.com">
+      </div>
+
+      <div class="input-group">
+        <label for="telefono">Teléfono</label>
+        <input type="tel" id="telefono" name="telefono" maxlength="15" required autocomplete="off" placeholder="123456789">
+      </div>
+
+      <div class="input-group">
+        <label for="tpassword">Contraseña</label>
+        <input type="password" id="tpassword" name="tpassword" maxlength="20" required autocomplete="off" placeholder="••••••••">
+      </div>
+
+      <div class="input-group">
+        <label for="tconfirmarpassword">Confirmar contraseña</label>
+        <input type="password" id="tconfirmarpassword" name="tconfirmarpassword" maxlength="20" required autocomplete="off" placeholder="••••••••">
+      </div>
+
+      <div class="botones">
+        <button type="reset" onclick="document.getElementById('tnombre').focus();">Limpiar</button>
+        <button type="submit">Registrarse</button>
+      </div>
+
+      <div class="registro">
+        <p>¿Ya tienes cuenta?</p>
+        <a href="/login">Inicia sesión aquí</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 80vh;
+  padding: 20px;
+  background-color: #6d4c41de;
+}
+
+.login-form {
+  background-color: #fff9f3;
+  padding: 40px 50px;
+  border-radius: 15px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+}
+
+.login-form h2 {
+  color: #5d4037;
+  margin-bottom: 30px;
+  font-size: 2.2em;
+}
+
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #6d4c41;
+  font-weight: 600;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #a1887f;
+  border-radius: 8px;
+  background-color: #f9f4f1;
+  color: #3e2723;
+  font-size: 1em;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #5d4037;
+  box-shadow: 0 0 0 3px rgba(93, 64, 55, 0.2);
+}
+
+.botones {
+  display: flex;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+button {
+  flex: 1;
+  background-color: #795548;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #5d4037;
+  transform: scale(1.03);
+}
+
+button:active {
+  background-color: #4e342e;
+}
+
+.registro
+{
+  margin-top: 10px;
+}
+
+  .registro a {
+    color: #007bff; 
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .registro a:hover {
+     color: #023d7c;
+    text-decoration: underline;
+    font-weight: bold;
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+  }
+
+.alerta {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px 20px;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .login-form {
+    padding: 30px 25px;
+  }
+
+  .login-form h2 {
+    font-size: 1.8em;
+  }
+
+  .input-group input {
+    padding: 10px 12px;
+  }
+
+  button {
+    padding: 10px 15px;
+    font-size: 1em;
+  }
+}
+</style>
+

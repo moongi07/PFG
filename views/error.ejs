@@ -1,0 +1,45 @@
+<div class="error-container">
+  <h1>¡Ups! Ocurrió un error</h1>
+  <p><%= 'Algo salió mal. Inténtalo de nuevo más tarde.' %></p>
+  <a href="/">Volver al inicio</a>
+</div>
+
+<style>
+  .error-container {
+    background-color: #fff;
+    border: 1px solid #f5c6cb;
+    border-radius: 10px;
+    padding: 30px 40px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    color: #721c24;
+    max-width: 500px;
+    margin: 100px auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .error-container h1 {
+    font-size: 2em;
+    color: #c0392b;
+    margin-bottom: 15px;
+  }
+
+  .error-container p {
+    font-size: 1.1em;
+  }
+
+  .error-container a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #c0392b;
+    color: #fff;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+
+  .error-container a:hover {
+    background-color: #a93226;
+  }
+</style>
