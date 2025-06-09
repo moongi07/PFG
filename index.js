@@ -106,13 +106,13 @@ app.use(express.static(path.join(__dirname,'public')));
 // no hay que poner extensión al fichero de rutas 
 //******************************************************************
 app.use(fileUpload());
-const rutas = require('./routes/las_rutas');
-const eventos = require('./routes/eventos_nuevo');
-const recomendar = require('./routes/test');
+const rutas = require('./src/routes/las_rutas');
+const eventos = require('./src//routes/eventos_nuevo');
+const recomendar = require('./src//routes/test');
 
 
 
-app.use('/', rutas);
+app.use( '/', rutas);
 app.use('/api/eventos', eventos);
 app.use('/api/test', recomendar);
 //******************************************************************
