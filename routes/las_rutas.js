@@ -12,9 +12,8 @@ const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require("uuid");
 
 
-const dbConnection = require('../config/dbConnection');
-// realizamos una conexión a la base de datos
-const connection = dbConnection();
+const connection = require('../config/dbConnection'); 
+
 
 
 
