@@ -1,10 +1,12 @@
 <div class="quiz-container">
   <h2>☕ ¿Qué café va contigo?</h2>
 
-  <form id="testForm">
+  <form id="testForm" aria-describedby="form-instructions">
+    <p id="form-instructions" class="sr-only">Responde las preguntas para recibir una recomendación de café.</p>
+
     <div class="form-group">
       <label for="sabor">1. ¿Cómo te gusta el sabor del café?</label>
-      <select name="sabor" required>
+      <select id="sabor" name="sabor" required aria-required="true">
         <option value="">Selecciona una opción</option>
         <option value="suave">Suave y ligero</option>
         <option value="intenso">Fuerte y potente</option>
@@ -14,7 +16,7 @@
 
     <div class="form-group">
       <label for="momento">2. ¿Cuándo lo sueles tomar?</label>
-      <select name="momento" required>
+      <select id="momento" name="momento" required aria-required="true">
         <option value="">Selecciona una opción</option>
         <option value="mañana">Por la mañana</option>
         <option value="tarde">Por la tarde</option>
@@ -26,7 +28,7 @@
   </form>
 </div>
 
-<div id="resultado" class="resultado"></div>
+<div id="resultado" class="resultado" role="region" aria-live="polite" aria-atomic="true"></div>
 
 <script>
   document.getElementById("testForm").addEventListener("submit", async (e) => {
@@ -41,14 +43,28 @@
       body: JSON.stringify({ sabor, momento })
     });
 
-    const data = await res.json();
+    const resultadoDiv = document.getElementById("resultado");
 
-    document.getElementById("resultado").innerHTML = `
+    if (!res.ok) {
+      resultadoDiv.innerHTML = `<p>Error al obtener la recomendación.</p>`;
+      return;
+    }
+
+    const data = await res.json();
+    const { cafe, libro } = data;
+
+    resultadoDiv.innerHTML = `
       <div class="card">
         <h3>Tu café recomendado es:</h3>
-        <h4>${data.nombre}</h4>
-        <img src="${data.imagen}" alt="Imagen del café recomendado" />
-        <p>${data.descripcion}</p>
+        <h4>${cafe.nombre}</h4>
+        <img src="${cafe.imagen}" alt="Imagen del café recomendado: ${cafe.nombre}" />
+        <p>${cafe.descripcion}</p>
+      </div>
+
+      <div class="card libro-recomendado">
+        <h3>Libro recomendado para acompañar:</h3>
+        <h4>${libro.titulo} - ${libro.autor}</h4>
+        <p>${libro.descripcion}</p>
       </div>
     `;
 
@@ -58,21 +74,30 @@
 
 <style>
   body {
-    background-color: #f4f1ee;
+    background-color: #6d4c41de;
     font-family: 'Segoe UI', sans-serif;
     margin: 0;
     padding: 0;
   }
 
-  .quiz-container {
-    max-width: 540px;
-    margin: 60px auto;
-    background-color: #fff;
-    padding: 35px;
-    border-radius: 18px;
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
-    color: #3e2f2f;
-  }
+ .quiz-container {
+  max-width: 540px;
+  margin: 60px auto;
+  background-color: #f4e4d4; /* Marrón claro */
+  padding: 35px;
+  border-radius: 18px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+  color: #3e2f2f;
+}
+
+.card {
+  background-color: #f2e7dc; /* Fondo cálido */
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
 
   .quiz-container h2 {
     text-align: center;
@@ -96,15 +121,18 @@
     width: 100%;
     padding: 12px;
     border-radius: 10px;
-    border: 1px solid #ccc;
+    border: 2px solid #b1876d;
     background-color: #fff8f3;
     font-size: 14px;
     transition: border-color 0.3s ease;
+    color: #3e2f2f;
   }
 
   select:focus {
-    border-color: #b1876d;
-    outline: none;
+    border-color: #6b4f4f;
+    outline: 3px solid #d9a55d;
+    outline-offset: 2px;
+    background-color: #fffdf8;
   }
 
   button[type="submit"] {
@@ -120,23 +148,20 @@
     transition: background 0.3s ease;
   }
 
-  button:hover {
+  button[type="submit"]:focus,
+  button[type="submit"]:hover {
     background: linear-gradient(135deg, #6b4f4f, #543c3c);
+    outline: 3px solid #ffd57f;
+    outline-offset: 2px;
   }
 
   .resultado {
     max-width: 540px;
     margin: 40px auto;
     animation: fadeIn 0.7s ease-in;
+    color: #3e2f2f;
   }
 
-  .card {
-    background-color: #fff;
-    border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    text-align: center;
-  }
 
   .card h3 {
     margin-bottom: 10px;
@@ -150,7 +175,8 @@
   }
 
   .card img {
-    margin-top: 15px;
+    margin: 15px auto 0 auto;
+    display: block;
     max-width: 180px;
     border-radius: 14px;
     box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
@@ -165,5 +191,17 @@
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Oculto para lectores de pantalla, accesible para aria-describedby */
+  .sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0,0,0,0) !important;
+    border: 0 !important;
   }
 </style>

@@ -5,7 +5,12 @@ html, body {
   display: flex;
   flex-direction: column;
 }
-
+    body {
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+            background-color: #6d4c41de;
+            color: #3e2723;
+        }
 main {
   flex: 1;
 }

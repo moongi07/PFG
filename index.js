@@ -21,33 +21,33 @@ app.use(session({
   }
 }));
 
-// Flash messages
+
 app.use(flash());
 app.use((req, res, next) => {
   res.locals.mensaje = req.flash("mensaje");
   next();
 });
 
-// Layouts
-app.use(expressLayouts);
-app.set('layout', 'layout'); // Usa views/layout.ejs
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views')); // ✅ views está en raíz
 
-// Bootstrap
+app.use(expressLayouts);
+app.set('layout', 'layout'); 
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views')); 
+
+
 app.use("/bootstrap", express.static("node_modules/bootstrap/dist"));
 
-// Archivos estáticos
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Body-parser
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Subida de archivos
+
 app.use(fileUpload());
 
-// Rutas (ahora están directamente en la raíz del proyecto)
+// Rutas 
 const rutas = require('./routes/las_rutas');
 const eventos = require('./routes/eventos_nuevo');
 const recomendar = require('./routes/test');

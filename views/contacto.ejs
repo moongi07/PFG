@@ -1,0 +1,166 @@
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+            body
+            {
+                background-color: #6d4c41de;
+            }
+            .contact-info h3:hover,
+            .contact-info h3:focus,
+            .contact-info h2:hover,
+            .contact-info h2:focus {
+            color: #a17a55;
+            outline: none;
+                }
+        .contact-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .contact-info {
+            background-color: #fff9f3;
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .contact-info h2 {
+            color: #5d4037;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            text-align: center;
+        }
+
+        .contact-info h3 {
+            color: #5d4037;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .info-section p {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-family: sans-serif;
+            line-height: 1.5;
+        }
+
+        .info-section p i {
+            font-size: 1.5em;
+            color: #795548;
+            margin-right: 15px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .social-links a {
+            color: #795548;
+            font-size: 2.5em;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #5d4037;
+            transform: scale(1.1);
+        }
+
+        .map-section iframe {
+            width: 100%;
+            height: 350px;
+            border: 0;
+            border-radius: 8px;
+        }
+
+        @media (min-width: 600px) {
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 580px) {
+            .contact-info {
+                padding: 30px 25px;
+            }
+
+            .contact-info h2 {
+                font-size: 1.8em;
+            }
+
+            .contact-info h3 {
+                font-size: 1.3em;
+            }
+
+            .info-section p {
+                font-size: 1em;
+            }
+            
+            .map-section iframe {
+                height: 250px;
+            }
+        }
+    </style>
+
+
+
+    <div class="contact-container">
+        <div class="contact-info">
+            <h2>Información de Contacto</h2>
+            
+            <div class="info-grid">
+                <div class="info-section">
+                    <h3>Nuestros Datos</h3>
+                    <p><i class='bx bxs-map'></i> Calle Ficticia 123, 28013 Madrid, España</p>
+                    <p><i class='bx bxs-phone'></i> +34 900 123 456</p>
+                    <p><i class='bx bxs-envelope'></i> info@tuempresa.com</p>
+                </div>
+                <div class="social-section">
+                    <h3>Síguenos</h3>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class='bx bxl-facebook-square'></i></a>
+                        <a href="#" aria-label="Twitter"><i class='bx bxl-twitter'></i></a>
+                        <a href="#" aria-label="Instagram"><i class='bx bxl-instagram-alt'></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class='bx bxl-linkedin-square'></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="map-section">
+                <h3>Nuestra Ubicación</h3>
+              <iframe 
+                src="https://www.openstreetmap.org/export/embed.html?bbox=-3.70836,40.41505,-3.7004,40.4199&layer=mapnik" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Mapa de nuestra cafetería en Calle Ficticia 123, Madrid"
+                tabindex="0">
+                </iframe>
+
+            </div>
+        </div>
+    </div>
+

@@ -9,21 +9,28 @@ router.get('/', (req, res) => {
       start: '2025-06-10',
       details: 'Una experiencia de degustación en la cafetería Central',
       location: 'Cafetería Central',
-      color: '#795548'
+      color: '#B7A05D'
     },
     {
       title: 'Taller de latte art',
       start: '2025-06-12',
       details: 'Aprende a decorar tu café como un profesional',
       location: 'Cafetería Central',
-      color: '#795548'
+      color: '#B7A05D'
     },
     {
       title: 'Club de lectura: "1984"',
       start: '2025-06-07',
       details: 'Debate y análisis del clásico de Orwell',
       location: 'Cafetería Central',
-      color: '#795548'
+      color: '#8998AB'
+    },
+      {
+      title: 'Concierto Wasia Project',
+      start: '2025-06-18',
+      details: 'Escucha en directo al duo británico Wasia project',
+      location: 'Cafetería Central',
+      color: '#9726B6'
     }
   ];
 
@@ -42,7 +49,7 @@ router.get('/', (req, res) => {
     };
   });
 
-  // Devuelve los eventos como JSON
+  // devuelve los eventos como JSON
   res.json(eventosConEnlace);
 });
 
