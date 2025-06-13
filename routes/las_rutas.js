@@ -11,9 +11,8 @@ const nodemailer = require('nodemailer');
 //para generar id unicos
 const { v4: uuidv4 } = require("uuid");
 
-
+//ahora usamos una pool si no en render no funciona
 const connection = require('../config/dbConnection'); 
-
 
 
 
@@ -163,30 +162,29 @@ router.post('/registro', async (req, res) => {
 });
 
     //vista de error
-router.get('/error', (req, res) => {
-    
-    res.render('error', { errorMessage: req.session.error });
-    
-    delete req.session.error;
-});
+    router.get('/error', (req, res) => {
+        res.render('error', { errorMessage: req.session.error });
+        delete req.session.error;
+    });
 
-router.delete('/eliminarreservas/:id', (req, res) => {
-  if (!req.session.userId) {
-    return res.status(401).json({ error: 'No autorizado' });
-  }
-const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER, 
-        pass: process.env.EMAIL_PASS 
-      },
-      secure: true, // Usar SSL
-      tls: {
-        rejectUnauthorized: false, // ayuda con algunos problemas de certificados
-      },
-    })
-  
-    // Verificamos la conexion, esto ya no haría falta, eran pruebas para solucionar errores
+    //eliminar reserva y mandar correo
+    router.delete('/eliminarreservas/:id', (req, res) => {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: 'No autorizado' });
+      }
+    const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL_USER, 
+            pass: process.env.EMAIL_PASS 
+          },
+          secure: true, // Usar SSL
+          tls: {
+            rejectUnauthorized: false, // ayuda con algunos problemas de certificados
+          },
+        })
+      
+    
     transporter.verify((error, success) => {
       if (error) {
         console.log("Error de configuración del servidor de correo:", error)
@@ -283,8 +281,6 @@ router.get('/menu', (req, res) => {
       bebidas: [],
       dulces: []
     };
-
-    
     results.forEach(producto => {
       const item = {
         id: producto.producto_id,
@@ -308,6 +304,7 @@ router.get('/menu', (req, res) => {
   });
 });
 
+//listado menu
 router.get('/menu', (req, res) => {
   const sql = "SELECT producto_id, nombre, descripcion, precio, seccion_id FROM producto";
 
@@ -316,9 +313,6 @@ router.get('/menu', (req, res) => {
       console.error("❌ Error al obtener productos:", err);
       return res.status(500).send("Error al obtener los productos");
     }
-
-
-
     const secciones = {
       cafes: [],
       bebidas: [],
@@ -375,12 +369,6 @@ router.get('/compra', (req, res) => {
 
   //hacemos el insert en la bbdd
   const sql = 'INSERT INTO consumicion (usuario_id, producto_id, cantidad) VALUES ?';
-
-  //GENERAMOS EL PDF
-  const PDFDocument = require('pdfkit');
-  const fs = require('fs');
-  const path = require('path');
-  const { v4: uuidv4 } = require('uuid');
 
   const tempDir = path.join(__dirname, "..", "temp");
   if (!fs.existsSync(tempDir)) {
@@ -533,7 +521,7 @@ router.get('/compra', (req, res) => {
 
 
 
-
+//mandamos un correo y lo metemos en la bbdd con cada reserva
 router.post('/reservas', (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ error: 'No autorizado' });
@@ -643,7 +631,7 @@ html: `
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.error('Error enviando email:', error);
-          // Puedes decidir si mandas error o confirmas la reserva aunque falle el email:
+          
           return res.status(500).json({ error: 'Reserva guardada pero no se pudo enviar el correo.' });
         }
         console.log('Email enviado:', info.response);
@@ -784,7 +772,7 @@ connection.query(sql, values, (err, result) => {
   res.redirect('/user');
 });
 });
-
+//vista contacto
 router.get('/contacto', (req, res) => {
   res.render('contacto'); 
 });
@@ -801,7 +789,7 @@ router.get('/reserva', (req, res) => {
   res.render('reserva');
 });
 
-
+//consultamos las mesas disponibles en la fecha que el usuario ha seleccionado
 router.get('/api/mesas-reservadas', (req, res) => {
   const { fecha } = req.query;
 
@@ -843,7 +831,6 @@ if (isNaN(fechaObj.getTime())) {
       return res.status(500).json({ error: "Error al obtener las reservas." });
     }
 
-    // Convertimos los mesa_id numéricos a "table-<n>"
     const mesasFormateadas = results.map(r => ({
       mesa_id: r.mesa_id
     }));

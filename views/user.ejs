@@ -110,7 +110,7 @@
         })
         .then(data => {
           alert('Reserva eliminada correctamente');
-          // Opcional: eliminar la tarjeta del DOM sin recargar la página
+          //eliminar la tarjeta del DOM sin recargar la página
           button.closest('.reserva-card').remove();
         })
         .catch(err => {
@@ -127,13 +127,13 @@
 <style>
  .perfil-container {
   display: flex;
-  flex-direction: column; /* vertical, para que no se apiñe */
+  flex-direction: column; 
   align-items: center;
   width: 100%;
   min-height: 80vh;
   background-color: #6d4c41de;
-  padding: 40px 20px; /* más espacio arriba y abajo */
-  gap: 40px; /* separación entre bloques principales */
+  padding: 40px 20px;
+  gap: 40px; 
   box-sizing: border-box;
 }
 
@@ -150,20 +150,20 @@
 
 
 .perfil-card h2 {
-  color: #3e2723; /* marrón oscuro, mejor contraste */
+  color: #3e2723; 
   font-weight: 700;
 }
 
 .logro-card h4 {
-  color: #3e2723; /* mismo marrón oscuro para uniformidad */
+  color: #3e2723; 
 }
 
 .perfil-datos li {
-  color: #4e342e; /* mantenemos un marrón medio para el texto normal */
+  color: #4e342e; 
 }
 
 .logro-card p {
-  color: #4e342e; /* marrón medio para textos descriptivos */
+  color: #4e342e; 
 }
 
 
@@ -339,7 +339,7 @@
   background-color: #c0392b;
 }
 
-/* Responsive */
+
 @media (max-width: 700px) {
   .perfil-container {
     padding: 20px 15px;
@@ -357,6 +357,47 @@
 
   .botones button {
     width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  .perfil-datos li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .perfil-datos li strong {
+    width: 100%;
+  }
+
+  .editar-formulario input {
+    font-size: 1em;
+    padding: 12px;
+  }
+
+  .logros-titulo,
+  .reservas-titulo {
+    font-size: 1.5em;
+  }
+
+  .reserva-card,
+  .logro-card {
+    padding: 20px;
+  }
+
+  .perfil-card h2 {
+    font-size: 1.5em;
+    text-align: center;
+  }
+
+  .btn-eliminar-reserva {
+    width: 100%;
+    text-align: center;
+  }
+
+  .logros-grid,
+  .reservas-grid {
+    grid-template-columns: 1fr; 
   }
 }
 
